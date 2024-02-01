@@ -1,27 +1,36 @@
-import { Text, View, TouchableOpacity } from 'react-native'
+import { Text, View, TouchableOpacity, Alert } from 'react-native'
 import { jwtManager } from '../../configs/configJwt';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser, selectUser } from '../../redux/userReducer/userSlice';
 import { useEffect } from 'react';
+import { navigate } from '../../configs/RootNavigation';
 
 export default function HomeScreen() {
     const dispatch = useDispatch();
     const getUser = useSelector(selectUser);
     const handleLogout = async () => {
         (await jwtManager).clear();
-        dispatch(clearUser());
+        navigate('Login')
+        Alert.alert("Logout Successful")
     }
 
     useEffect(() => {
-        console.log(getUser)
-    }, [getUser])
+    }, [])
 
     return (
-        <View>
+        <View
+            style={{
+                flex: 1
+            }}
+        >
             <Text>
                 Welcome to Home page
             </Text>
-            <TouchableOpacity onPress={handleLogout}>
+            <TouchableOpacity
+                style={{
+                    backgroundColor: 'red'
+                }}
+                onPress={handleLogout}>
                 <Text>
                     Logout
                 </Text>

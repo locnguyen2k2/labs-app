@@ -14,8 +14,8 @@ const login = async (LoginDto: { email: string, password: string }) => {
     return await axios.post('auths/login', data)
 }
 
-const checkLogin = () => {
-
+const checkLogin = async () => {
+    return await axios.get('auths/info')
 }
 
 export default {

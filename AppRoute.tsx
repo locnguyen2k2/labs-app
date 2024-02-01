@@ -1,76 +1,45 @@
-import accountService from './src/services/accounts/account.service';
+import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native'
-import { useSelector, useDispatch } from 'react-redux';
-import { clearUser, selectUser, setUser } from './src/redux/userReducer/userSlice';
-import { jwtManager } from './src/configs/configJwt';
-import userService from './src/services/users/user.service';
 import Tabs from './src/resources/navigation/Tab';
+import { jwtManager } from './src/configs/configJwt';
+import { setUser } from './src/redux/userReducer/userSlice';
+import { Alert, Text, TouchableOpacity, View } from 'react-native'
+import accountService from './src/services/accounts/account.service';
+import { LoginScreen } from './src/resources/screens';
 
 export default function AppRoute() {
-    const [isAuth, setIsAuth] = useState(useSelector(selectUser));
     const dispatch = useDispatch();
+    const [isAuth, setIsAuth] = useState<boolean>(false);
+    const [token, setToken] = useState<string | null>(null);
+    const getToken = async () => setToken((await jwtManager).get());
     useEffect(() => {
-        let promise = new Promise(async function token() {
-            return (await jwtManager).get();
-        })
-        console.log(promise)
-        if (isAuth.isLogin) {
-            userService.getProfile()
+        getToken();
+        if (token) {
+            accountService.checkLogin()
                 .then((res: any) => {
-                    const info = res.data
                     dispatch(setUser({
                         info: {
-                            id: info.id,
-                            fullName: info.firstName + ' ' + info.lastName,
-                            address: info.address,
-                            role: info.role,
-                            email: info.email,
-                            isLogin: true
+                            id: res.data.id,
+                            email: res.data.email,
+                            fullName: res.data.firstName + ' ' + res.data.lastName,
+                            role: res.data.role,
+                            address: res.data.address,
+                            isLogin: true,
                         }
                     }))
+                    setIsAuth(true)
                 })
-                .catch((error: any) => {
-                    dispatch(clearUser())
-                    Alert.alert(error.response?.data.message)
+                .catch(async (error: any) => {
+                    (await jwtManager).clear();
+                    Alert.alert(error.response.data.message);
                 })
         }
-    }, [isAuth])
-
-    const handleLogin = () => {
-        accountService.login({ email: 'locnguyentan1230@gmail.com', password: '123456789Loc' })
-            .then(async (res: any) => {
-                await (await jwtManager).set(res.data.access_token)
-                setIsAuth({ ...isAuth, isLogin: true })
-                Alert.alert("Login successfull!")
-            })
-            .catch((error: any) => {
-                Alert.alert(error.response?.data.message)
-            })
-    }
+    }, [token])
     return (
-        <View>
+        <>
             {
-                isAuth.isLogin ?
-                    <Tabs />
-                    :
-                    <>
-                        <Text>
-                            Login to continute ...
-                        </Text>
-                        <TouchableOpacity
-                            onPress={handleLogin}
-                        >
-                            <Text
-                                style={{
-                                    backgroundColor: 'red'
-                                }}
-                            >
-                                Click
-                            </Text>
-                        </TouchableOpacity>
-                    </>
+                isAuth ? <Tabs /> : <LoginScreen />
             }
-        </View>
+        </>
     )
 }

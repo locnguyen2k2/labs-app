@@ -15,4 +15,4 @@ export const configAxios = () => {
             return Promise.reject(error);
         }
     )
-}
+} 

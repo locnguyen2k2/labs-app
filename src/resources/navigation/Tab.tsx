@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { NavigationContainer } from '@react-navigation/native'
-import { navigationRef } from '../../configs/configRootNavigation'
-import { HomeScreen } from '../screens'
+import { navigationRef } from '../../configs/RootNavigation'
+import { HomeScreen, LoginScreen } from '../screens'
 
 const Tab = createBottomTabNavigator()
 export default function Tabs() {
@@ -24,10 +24,10 @@ export default function Tabs() {
                         }}
                     />
                     <Tab.Screen
-                        name='Product'
-                        component={HomeScreen}
+                        name='Login'
+                        component={LoginScreen}
                         options={{
-
+                            tabBarButton: () => null,
                         }}
                     />
                 </Tab.Navigator>
